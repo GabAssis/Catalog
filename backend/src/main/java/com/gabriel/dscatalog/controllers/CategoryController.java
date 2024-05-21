@@ -21,6 +21,13 @@ public class CategoryController {
         List<CategoryDTO> list = service.findAll();
         return ResponseEntity.ok().body(list);
     }
+    @GetMapping(value = "/{id}")
+    public ResponseEntity<CategoryDTO> findbyId(@PathVariable Long id){
+        CategoryDTO dto = service.findById(id);
+        return ResponseEntity.ok().body(dto);
+    }
+
+
 
 
 }
