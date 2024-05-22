@@ -1,7 +1,6 @@
 package com.gabriel.dscatalog.models;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import org.hibernate.validator.constraints.URL;
 
@@ -97,6 +96,10 @@ public class Product implements Serializable {
 
     public void setName(@NotBlank(message = "Campo obrigatório") String name) {
         this.name = name;
+    }
+
+    public Set<Category> getCategories() {
+        return categories;
     }
 
     @Override
