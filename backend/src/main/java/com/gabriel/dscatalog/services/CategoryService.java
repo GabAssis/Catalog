@@ -52,11 +52,13 @@ public class CategoryService {
     }
 
     public void delete(Long id) {
-        if (!repository.existsById(id)){
-            throw new EntityNotFound("Id not found " + id);
-        }try{
+        try {
             repository.deleteById(id);
-        }catch (DataIntegrityViolationException e){
+        }
+        catch (EmptyResultDataAccessException e) {
+            throw new EntityNotFound("Id not found " + id);
+        }
+        catch (DataIntegrityViolationException e) {
             throw new DatabaseException("Integrity violation");
         }
     }

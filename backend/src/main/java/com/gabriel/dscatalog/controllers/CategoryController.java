@@ -9,6 +9,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+
 @RestController
 @RequestMapping(value = "/categories")
 @CrossOrigin(allowedHeaders = "*", origins = "*")
@@ -25,7 +26,9 @@ public class CategoryController {
             @RequestParam(value = "orderBy", defaultValue = "name") String orderBy)
     {
         PageRequest pageRequest = PageRequest.of(page,linesPerPage, Sort.Direction.valueOf(direction), orderBy);
+
         Page<CategoryDTO> list = service.findAllPaged(pageRequest);
+
         return ResponseEntity.ok().body(list);
     }
 

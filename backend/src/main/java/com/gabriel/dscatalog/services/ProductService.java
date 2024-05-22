@@ -1,13 +1,16 @@
 package com.gabriel.dscatalog.services;
 
-
+import com.gabriel.dscatalog.dto.CategoryDTO;
 import com.gabriel.dscatalog.dto.ProductDTO;
+import com.gabriel.dscatalog.models.Category;
 import com.gabriel.dscatalog.models.Product;
+import com.gabriel.dscatalog.repositories.CategoryRepository;
 import com.gabriel.dscatalog.repositories.ProductRepository;
 import com.gabriel.dscatalog.services.exceptions.DatabaseException;
 import com.gabriel.dscatalog.services.exceptions.EntityNotFound;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -21,12 +24,13 @@ public class ProductService {
     @Autowired
     private ProductRepository repository;
 
+    @Autowired
+    private CategoryRepository categoryRepository;
+
     @Transactional(readOnly = true)
-    public Page<ProductDTO> findAllPaged(PageRequest pageRequest){
+    public Page<ProductDTO> findAllPaged(PageRequest pageRequest) {
         Page<Product> list = repository.findAll(pageRequest);
         return list.map(x -> new ProductDTO(x));
-
-
     }
 
     @Transactional(readOnly = true)
@@ -39,36 +43,44 @@ public class ProductService {
     @Transactional
     public ProductDTO insert(ProductDTO dto) {
         Product entity = new Product();
-        entity.setName(dto.getName());
-        entity.setDescription(dto.getDescription());
-        entity.setPrice(dto.getPrice());
-        entity.setImgUrl(dto.getImgUrl());
+        copyDtoToEntity(dto, entity);
         entity = repository.save(entity);
         return new ProductDTO(entity);
     }
+
     @Transactional
-    public ProductDTO update(Long id,ProductDTO dto) {
-            Optional<Product> obj = repository.findById(id);
-            Product entity = obj.orElseThrow(() -> new EntityNotFound("Id not found" + id));
-            entity.setName(dto.getName());
-            entity.setDescription(dto.getDescription());
-            entity.setPrice(dto.getPrice());
-            entity.setImgUrl(dto.getImgUrl());
-            entity = repository.save(entity);
-            entity = repository.save(entity);
-            return new ProductDTO(entity);
+    public ProductDTO update(Long id, ProductDTO dto) {
+        Optional<Product> obj = repository.findById(id);
+        Product entity = obj.orElseThrow(() -> new EntityNotFound("Id not found" + id));
+        entity.setName(dto.getName());
+        entity = repository.save(entity);
+        return new ProductDTO(entity);
     }
 
     public void delete(Long id) {
-        if (!repository.existsById(id)){
-            throw new EntityNotFound("Id not found " + id);
-        }try{
+        try {
             repository.deleteById(id);
-        }catch (DataIntegrityViolationException e){
+        }
+        catch (EmptyResultDataAccessException e) {
+            throw new EntityNotFound("Id not found " + id);
+        }
+        catch (DataIntegrityViolationException e) {
             throw new DatabaseException("Integrity violation");
         }
     }
+
+    private void copyDtoToEntity(ProductDTO dto, Product entity) {
+
+        entity.setName(dto.getName());
+        entity.setDescription(dto.getDescription());
+        entity.setDate(dto.getDate());
+        entity.setImgUrl(dto.getImgUrl());
+        entity.setPrice(dto.getPrice());
+
+        entity.getCategories().clear();
+        for (CategoryDTO catDto : dto.getCategories()) {
+            Category category = categoryRepository.getOne(catDto.getId());
+            entity.getCategories().add(category);
+        }
+    }
 }
-
-
-
