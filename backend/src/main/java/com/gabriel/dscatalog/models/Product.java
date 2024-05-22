@@ -1,14 +1,11 @@
 package com.gabriel.dscatalog.models;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import org.hibernate.validator.constraints.URL;
+
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -19,8 +16,6 @@ public class Product implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
-    @NotBlank(message = "Campo obrigatório")
     private String name;
 
     @Column(columnDefinition = "TEXT")
@@ -32,11 +27,9 @@ public class Product implements Serializable {
     private Instant date;
 
     @ManyToMany
-    @JoinTable(
-            name = "tb_product_category",
+    @JoinTable(name = "tb_product_category",
             joinColumns = @JoinColumn(name = "product_id"),
-            inverseJoinColumns = @JoinColumn(name = "category_id")
-    )
+            inverseJoinColumns = @JoinColumn(name = "category_id"))
     Set<Category> categories = new HashSet<>();
 
     public Product() {
@@ -59,28 +52,12 @@ public class Product implements Serializable {
         this.id = id;
     }
 
-    public Instant getDate() {
-        return date;
+    public String getName() {
+        return name;
     }
 
-    public void setDate(Instant date) {
-        this.date = date;
-    }
-
-    public @URL(message = "Deve ser uma URL válida") String getImgUrl() {
-        return imgUrl;
-    }
-
-    public void setImgUrl(@URL(message = "Deve ser uma URL válida") String imgUrl) {
-        this.imgUrl = imgUrl;
-    }
-
-    public Double getPrice() {
-        return price;
-    }
-
-    public void setPrice(Double price) {
-        this.price = price;
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getDescription() {
@@ -91,24 +68,56 @@ public class Product implements Serializable {
         this.description = description;
     }
 
-    public @NotBlank(message = "Campo obrigatório") String getName() {
-        return name;
+    public Double getPrice() {
+        return price;
     }
 
-    public void setName(@NotBlank(message = "Campo obrigatório") String name) {
-        this.name = name;
+    public void setPrice(Double price) {
+        this.price = price;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Product product = (Product) o;
-        return Objects.equals(id, product.id);
+    public String getImgUrl() {
+        return imgUrl;
+    }
+
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
+    }
+
+    public Instant getDate() {
+        return date;
+    }
+
+    public void setDate(Instant date) {
+        this.date = date;
+    }
+
+    public Set<Category> getCategories() {
+        return categories;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(id);
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        Product other = (Product) obj;
+        if (id == null) {
+            if (other.id != null)
+                return false;
+        } else if (!id.equals(other.id))
+            return false;
+        return true;
     }
 }
