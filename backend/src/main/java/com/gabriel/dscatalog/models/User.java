@@ -24,7 +24,7 @@ public class User implements Serializable {
 	private String email;
 	private String password;
 	
-
+	@ManyToMany(fetch = FetchType.EAGER)
 	private Set<Role> roles = new HashSet<>();
 	
 	public User() {
